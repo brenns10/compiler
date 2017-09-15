@@ -1,6 +1,7 @@
 %{
 #include "stdio.h"
 #include "stdlib.h"
+int temp = 0;
 int yylex(void);
 void yyerror(const char * err) {
 	fprintf(stderr, "%s\n", err);
@@ -17,23 +18,38 @@ start
 ;
 
 line
-: expr '\n' { printf("= %d\n", $1); }
+: expr '\n' { printf("OUT: t%d\n", $1); }
 ;
 
 expr
-: expr '+' term { $$ = $1 + $3; }
-| expr '-' term { $$ = $1 - $3; }
+: expr '+' term {
+	$$ = temp++;
+	printf("t%d = t%d + t%d\n", $$, $1, $3);
+}
+| expr '-' term {
+	$$ = temp++;
+	printf("t%d = t%d - t%d\n", $$, $1, $3);
+}
 | term { $$ = $1; }
 ;
 
 term
-: term '*' number { $$ = $1 * $3; }
-| term '/' number { $$ = $1 / $3; }
+: term '*' number {
+	$$ = temp++;
+	printf("t%d = t%d * t%d\n", $$, $1, $3);
+}
+| term '/' number {
+	$$ = temp++;
+	printf("t%d = t%d / t%d\n", $$, $1, $3);;
+}
 | number { $$ = $1; }
 ;
 
 number
-: NUMBER { $$ = $1; }
+: NUMBER {
+	$$ = temp++;
+	printf("t%d = %d\n", $$, $1);
+}
 | '(' expr ')' { $$ = $1; }
 ;
 %%
